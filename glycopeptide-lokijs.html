@@ -1,0 +1,41 @@
+<!-- Imports polymer -->
+<link rel="import" href="../polymer/polymer.html">
+
+<script src="../lokijs/src/lokijs.js"></script>
+
+<!-- Defines element markup -->
+<dom-module id="glycopeptide-lokijs">
+
+    <!-- Registers custom element -->
+    <script>
+    Polymer({
+        is: 'glycopeptide-lokijs',
+        properties: {
+            dbName: {
+                type: String,
+                value: 'glycopeptide_dataset'
+            }
+        },
+        attached: function () {
+            db = new Loki(this.dbName, {
+                autosave: true,
+                autosaveInterval: 1000//,
+                //adapter: adapter
+            });
+        },
+        addCollection: function (name, file) {
+            var map = db.addCollection(name);
+            var jsonString = fs.readFileSync(file, 'utf8');
+            map.insert(JSON.parse(jsonString));
+        },
+        getItem: function (collectionName, item, value) {
+            var map = this.db.getCollection(collectionName);
+            var query = map.by(item, value);
+            if(query){
+                return query.list;
+            }
+            return [];
+        }
+    });
+    </script>
+</dom-module>
